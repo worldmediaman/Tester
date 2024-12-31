@@ -1,37 +1,26 @@
 import requests
+import re
 import os
-import json
 
-request_url = "https://zagent891.h-cdn.com/cmd/get_links_info"
-params = {
-    'customer': 'atv',
-    'zone': 'gen',
-    'ver': '1.165.105',
-    'url': 'https://www.atvavrupa.tv/canli-yayin'
-}
+loader_url = "https://player.h-cdn.com/loader.js?customer=atv"
 output_file_path = "result/List/ATV.m3u8"
 
 def fetch_and_save_atv():
     try:
-        # Senden einer Anfrage, um die Streaming-Daten zu erhalten
-        response = requests.get(request_url, params=params)
+        # Laden des loader.js Skripts
+        response = requests.get(loader_url)
         response.raise_for_status()
-        content = response.json()
+        content = response.text
         
-        # Debug: Ausgabe der gesamten Antwort
-        print("Antwortinhalt:")
-        print(json.dumps(content, indent=2))
+        # Debug: Ausgabe des gesamten Skriptinhalts
+        print("Skriptinhalt:")
+        print(content[:1000])  # Ausgabe der ersten 1000 Zeichen zur Überprüfung
+        
+        # Suchen nach der m3u8-URL im Skript
+        m3u8_url = re.search(r'(https?://[^\s]+\.m3u8[^\s]*)', content)
+        if m3u8_url:
+            m3u8_url = m3u8_url.group(1)
 
-        # Extrahieren der m3u8-URL aus der Antwort
-        m3u8_url = None
-        # Wir gehen davon aus, dass die URL im Wert von 'data' oder 'url' liegt.
-        if 'data' in content:
-            m3u8_url = content['data']
-        elif 'url' in content:
-            m3u8_url = content['url']
-        
-        # Weitere Validierung der URL
-        if m3u8_url and m3u8_url.endswith('.m3u8'):
             # Erstellen des M3U8-Inhalts
             m3u8_content = f"""#EXTM3U
 #EXT-X-VERSION:3
@@ -49,7 +38,7 @@ def fetch_and_save_atv():
             print("Inhalt:")
             print(m3u8_content)  # Inhalt für Debugging ausgeben
         else:
-            print("m3u8-URL in der Antwort nicht gefunden oder nicht gültig.")
+            print("m3u8-URL im Skriptinhalt nicht gefunden oder nicht gültig.")
     except requests.RequestException as e:
         print(f"Fehler beim Abrufen von ATV: {e}")
 

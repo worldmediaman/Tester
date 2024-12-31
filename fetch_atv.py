@@ -60,8 +60,8 @@ def fetch_and_save_atv():
         print(json.dumps(content_3, indent=2))
         
         # Extrahieren der dynamischen Parameter aus der dritten Antwort
-        session_id = content_3.get('session_id')
-        st = content_3.get('st')
+        st = content_3.get('Url').split('?st=')[1].split('&')[0]
+        session_id = "45d4cd69-814c-4e2e-bdad-11de9e4b9afd"
         
         # Debug: Überprüfen der extrahierten Werte
         print(f"Extrahierte Werte: session_id={session_id}, st={st}")

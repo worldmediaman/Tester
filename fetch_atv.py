@@ -10,12 +10,18 @@ params = {
     'ver': '1.165.105',
     'url': 'https://www.atvavrupa.tv/canli-yayin'
 }
+headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
+    'Accept': 'application/json, text/javascript, */*; q=0.01',
+    'Accept-Language': 'en-US,en;q=0.9',
+    'X-Requested-With': 'XMLHttpRequest'
+}
 output_file_path = "result/List/ATV.m3u8"
 
 def fetch_and_save_atv():
     try:
         # Senden einer Anfrage, um die Streaming-Daten zu erhalten
-        response = requests.get(ajax_url, params=params)
+        response = requests.get(ajax_url, params=params, headers=headers)
         response.raise_for_status()
         content = response.json()
         

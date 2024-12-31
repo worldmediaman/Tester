@@ -70,4 +70,19 @@ def fetch_and_save_atv():
         # Debug: Überprüfen der extrahierten Werte
         print(f"Extrahierte Werte: session_id={session_id}, st={st}")
 
-        # Überprüfen, ob die Parameter korrekt
+        # Weiteres Code zum Verarbeiten und Speichern der Daten
+        with open(output_file_path, 'w') as file:
+            file.write(f"#EXTM3U\n#EXT-X-STREAM-INF:BANDWIDTH=1280000\n{base_m3u8_url}?st={st}&e=1578381600&session_id={session_id}\n")
+
+        print(f"Erfolgreich gespeichert in: {output_file_path}")
+    except requests.RequestException as e:
+        print(f"Netzwerkfehler: {e}")
+    except KeyError as e:
+        print(f"Fehlender Schlüssel im Antwortinhalt: {e}")
+    except Exception as e:
+        print(f"Ein unerwarteter Fehler ist aufgetreten: {e}")
+    finally:
+        print("Fertig mit Aufräumarbeiten.")
+
+# Funktion ausführen
+fetch_and_save_atv()

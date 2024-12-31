@@ -2,7 +2,7 @@ name: Update ATV Playlist
 
 on:
   schedule:
-    - cron: '0 */3 * * *'  # Alle 2 Stunden
+    - cron: '0 */2 * * *'  # Alle 2 Stunden
   workflow_dispatch:  # Manueller Auslöser für den Workflow
 
 jobs:
@@ -33,4 +33,4 @@ jobs:
           git commit -m "ATV Playlist updated" || echo "Keine Änderungen zum Committen"
           git push
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}

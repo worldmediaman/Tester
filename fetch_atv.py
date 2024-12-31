@@ -62,6 +62,15 @@ def fetch_and_save_atv():
         # Extrahieren der dynamischen Parameter aus der dritten Antwort
         session_id = content_3.get('session_id')
         st = content_3.get('st')
+        
+        # Debug: Überprüfen der extrahierten Werte
+        print(f"Extrahierte Werte: session_id={session_id}, st={st}")
+
+        # Überprüfen, ob die Parameter korrekt extrahiert wurden
+        if not st or not session_id:
+            print("Fehler: st oder session_id konnte nicht extrahiert werden.")
+            return
+        
         e = str(int(time.time()) + 7200)  # Ablaufzeit in 2 Stunden
         
         # Generieren der vollständigen m3u8-URL

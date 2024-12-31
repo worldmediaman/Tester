@@ -1,23 +1,60 @@
+import requests
 import os
+import json
 
-# Die gefundene m3u8-URL
-m3u8_url = "https://trkvz-live.ercdn.net/atvavrupa/atvavrupa_576p.m3u8?st=ne981CQj45Am3u7EetrT1g&e=1735653004&SessionID=1.2.1151918422.1735605691&StreamGroup=canli-yayin&Site=atvavrupa&DeviceGroup=web"
+# URLs für die Anfragen
+ajax_url = "https://www.atvavrupa.tv/ajax/streaming"
+params_1 = {'menuType': 'CANLIYAYIN'}
+video_info_url = "https://videojs.tmgrup.com.tr/getvideo/45d4cd69-814c-4e2e-bdad-11de9e4b9afd/00000000-0000-0000-0000-000000000000"
+
 output_file_path = "result/List/ATV.m3u8"
 
-# Sicherstellen, dass der Ausgabeordner existiert
-os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
-
-# Erstellen des M3U8-Inhalts
-m3u8_content = f"""#EXTM3U
+def fetch_and_save_atv():
+    try:
+        # Senden der ersten Anfrage, um die Streaming-Daten zu erhalten
+        response_1 = requests.get(ajax_url, params=params_1)
+        response_1.raise_for_status()
+        content_1 = response_1.json()
+        
+        # Debug: Ausgabe der ersten Antwort
+        print("Antwortinhalt 1:")
+        print(json.dumps(content_1, indent=2))
+        
+        # Senden der zweiten Anfrage, um die Video-Informationen zu erhalten
+        response_2 = requests.get(video_info_url)
+        response_2.raise_for_status()
+        content_2 = response_2.json()
+        
+        # Debug: Ausgabe der zweiten Antwort
+        print("Antwortinhalt 2:")
+        print(json.dumps(content_2, indent=2))
+        
+        # Extrahieren der m3u8-URL aus der zweiten Antwort
+        video_data = content_2.get("video", {})
+        m3u8_url = video_data.get("VideoUrl")
+        
+        # Weitere Validierung der URL
+        if m3u8_url and m3u8_url.endswith('.m3u8'):
+            # Erstellen des M3U8-Inhalts
+            m3u8_content = f"""#EXTM3U
 #EXT-X-VERSION:3
 #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=3000000,RESOLUTION=1920x1080
 {m3u8_url}
 """
+            # Sicherstellen, dass der Ausgabeordner existiert
+            os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
+            
+            # Speichern des M3U8-Inhalts in einer Datei
+            with open(output_file_path, "w") as f:
+                f.write(m3u8_content)
+            
+            print(f"{output_file_path} Datei erfolgreich erstellt.")
+            print("Inhalt:")
+            print(m3u8_content)  # Inhalt für Debugging ausgeben
+        else:
+            print("m3u8-URL in der Antwort nicht gefunden oder nicht gültig.")
+    except requests.RequestException as e:
+        print(f"Fehler beim Abrufen von ATV: {e}")
 
-# Speichern des M3U8-Inhalts in einer Datei
-with open(output_file_path, "w") as f:
-    f.write(m3u8_content)
-
-print(f"{output_file_path} Datei erfolgreich erstellt.")
-print("Inhalt:")
-print(m3u8_content)  # Inhalt für Debugging ausgeben
+if __name__ == "__main__":
+    fetch_and_save_atv()

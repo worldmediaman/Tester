@@ -17,6 +17,10 @@ def fetch_and_save_atv():
         ajax_response.raise_for_status()
         ajax_content = ajax_response.json()
         
+        # Debug: Ausgabe der gesamten Ajax-Antwort
+        print("Ajax-Antwort:")
+        print(json.dumps(ajax_content, indent=2))
+
         # Extrahieren der m3u8-URL aus der Ajax-Antwort
         m3u8_url = ajax_content.get('data')
         if m3u8_url and m3u8_url.endswith('.m3u8'):

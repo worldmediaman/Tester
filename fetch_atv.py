@@ -23,7 +23,14 @@ def fetch_and_save_atv():
         print(json.dumps(content, indent=2))
 
         # Extrahieren der m3u8-URL aus der Antwort
-        m3u8_url = content.get('url')  # Hier anpassen, um die korrekte m3u8-URL zu extrahieren
+        m3u8_url = None
+        # Wir gehen davon aus, dass die URL im Wert von 'data' oder 'url' liegt.
+        if 'data' in content:
+            m3u8_url = content['data']
+        elif 'url' in content:
+            m3u8_url = content['url']
+        
+        # Weitere Validierung der URL
         if m3u8_url and m3u8_url.endswith('.m3u8'):
             # Erstellen des M3U8-Inhalts
             m3u8_content = f"""#EXTM3U

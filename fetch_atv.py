@@ -72,9 +72,9 @@ def fetch_and_save_atv():
             # Sicherstellen, dass der Ausgabeordner existiert
             os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
             
-            # Speichern der m3u8-URL in einer Datei
+            # Speichern der m3u8-URL in einer Datei mit Zeitstempel
             with open(output_file_path, "w") as f:
-                f.write(m3u8_url)
+                f.write(f"{m3u8_url}\nZeitstempel: {time.ctime()}")
             
             print(f"{output_file_path} Datei erfolgreich erstellt.")
             print("Inhalt:")

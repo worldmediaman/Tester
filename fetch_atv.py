@@ -65,23 +65,16 @@ def fetch_and_save_atv():
         
         # Weitere Validierung und Erstellen des M3U8-Inhalts
         if m3u8_url:
-            # Erstellen des M3U8-Inhalts
-            m3u8_content = f"""#EXTM3U
-#EXT-X-VERSION:3
-
-#EXTINF:-1, ATV Avrupa
-{m3u8_url}
-"""
             # Sicherstellen, dass der Ausgabeordner existiert
             os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
             
-            # Speichern des M3U8-Inhalts in einer Datei
+            # Speichern der m3u8-URL in einer Datei
             with open(output_file_path, "w") as f:
-                f.write(m3u8_content)
+                f.write(m3u8_url)
             
             print(f"{output_file_path} Datei erfolgreich erstellt.")
             print("Inhalt:")
-            print(m3u8_content)  # Inhalt für Debugging ausgeben
+            print(m3u8_url)  # Inhalt für Debugging ausgeben
         else:
             print("m3u8-URL in der Antwort nicht gefunden oder nicht gültig.")
     except requests.RequestException as e:

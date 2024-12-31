@@ -3,6 +3,7 @@ import re
 import os
 
 loader_url = "https://player.h-cdn.com/loader.js?customer=atv"
+config_url = "https://player.h-cdn.com/config.js?customer=atv"
 output_file_path = "result/List/ATV.m3u8"
 
 def fetch_and_save_atv():
@@ -10,14 +11,25 @@ def fetch_and_save_atv():
         # Laden des loader.js Skripts
         response = requests.get(loader_url)
         response.raise_for_status()
-        content = response.text
+        loader_content = response.text
+
+        # Laden des config.js Skripts
+        response = requests.get(config_url)
+        response.raise_for_status()
+        config_content = response.text
+
+        # Debug: Ausgabe der ersten 1000 Zeichen der Skriptinhalte zur Überprüfung
+        print("Loader Skriptinhalt:")
+        print(loader_content[:1000])
+        print("Config Skriptinhalt:")
+        print(config_content[:1000])
         
-        # Debug: Ausgabe des gesamten Skriptinhalts
-        print("Skriptinhalt:")
-        print(content[:1000])  # Ausgabe der ersten 1000 Zeichen zur Überprüfung
+        # Suchen nach der m3u8-URL im config.js Skript
+        m3u8_url = re.search(r'(https?://[^\s]+\.m3u8[^\s]*)', config_content)
+        if not m3u8_url:
+            # Falls keine URL im config.js Skript gefunden wurde, im loader.js Skript suchen
+            m3u8_url = re.search(r'(https?://[^\s]+\.m3u8[^\s]*)', loader_content)
         
-        # Suchen nach der m3u8-URL im Skript
-        m3u8_url = re.search(r'(https?://[^\s]+\.m3u8[^\s]*)', content)
         if m3u8_url:
             m3u8_url = m3u8_url.group(1)
 
@@ -38,7 +50,7 @@ def fetch_and_save_atv():
             print("Inhalt:")
             print(m3u8_content)  # Inhalt für Debugging ausgeben
         else:
-            print("m3u8-URL im Skriptinhalt nicht gefunden oder nicht gültig.")
+            print("m3u8-URL in den Skriptinhalten nicht gefunden oder nicht gültig.")
     except requests.RequestException as e:
         print(f"Fehler beim Abrufen von ATV: {e}")
 

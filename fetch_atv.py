@@ -7,14 +7,19 @@ import time
 streaming_url = "https://www.atvavrupa.tv/ajax/streaming"
 params_1 = {'menuType': 'CANLIYAYIN'}
 video_info_url = "https://videojs.tmgrup.com.tr/getvideo/45d4cd69-814c-4e2e-bdad-11de9e4b9afd/00000000-0000-0000-0000-000000000000"
-secure_token_url = "https://securevideotoken.tmgrup.com.tr/webtv/secure?271042"
+secure_token_url = "https://securevideotoken.tmgrup.com.tr/webtv/secure"
 
 output_file_path = "result/List/ATV.m3u8"
+
+headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+    'Accept-Language': 'en-US,en;q=0.9'
+}
 
 def fetch_and_save_atv():
     try:
         # Senden der ersten Anfrage, um die Streaming-Daten zu erhalten
-        response_1 = requests.get(streaming_url, params=params_1)
+        response_1 = requests.get(streaming_url, params=params_1, headers=headers)
         response_1.raise_for_status()
         content_1 = response_1.json()
         
@@ -23,7 +28,7 @@ def fetch_and_save_atv():
         print(json.dumps(content_1, indent=2))
         
         # Senden der zweiten Anfrage, um die Video-Informationen zu erhalten
-        response_2 = requests.get(video_info_url)
+        response_2 = requests.get(video_info_url, headers=headers)
         response_2.raise_for_status()
         content_2 = response_2.json()
         
@@ -43,7 +48,7 @@ def fetch_and_save_atv():
             'url': base_m3u8_url,
             'url2': base_m3u8_url
         }
-        response_3 = requests.get(secure_token_url, params=secure_params)
+        response_3 = requests.get(secure_token_url, params=secure_params, headers=headers)
         response_3.raise_for_status()
         content_3 = response_3.json()
         

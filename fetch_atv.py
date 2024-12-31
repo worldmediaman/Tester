@@ -1,6 +1,7 @@
 import requests
 import os
 import json
+import time
 
 # URLs für die Anfragen
 streaming_url = "https://www.atvavrupa.tv/ajax/streaming"
@@ -40,7 +41,7 @@ def fetch_and_save_atv():
         # Senden der dritten Anfrage, um die SessionID und andere Parameter zu erhalten
         params_3 = {
             'websiteid': '45d4cd69-814c-4e2e-bdad-11de9e4b9afd',
-            'dateminute': '1735609577'
+            'dateminute': str(int(time.time() // 60))
         }
         response_3 = requests.get(session_url, params=params_3)
         response_3.raise_for_status()
@@ -51,12 +52,12 @@ def fetch_and_save_atv():
         print(json.dumps(content_3, indent=2))
         
         # Dynamische Parameter hinzufügen
-        session_id = "1.2.1151918422.1735605691"
+        session_id = params_3['websiteid']
         stream_group = "canli-yayin"
         site = "atvavrupa"
         device_group = "web"
-        st = "eW-KN6yUN7ahfDxXDare3g"
-        e = "1735655057"
+        st = "eW-KN6yUN7ahfDxXDare3g"  # Dieser sollte dynamisch sein, eventuell aus Antwortinhalt 3
+        e = str(int(time.time()) + 7200)  # Ablaufzeit in 2 Stunden
         
         m3u8_url = f"{base_m3u8_url}?st={st}&e={e}&SessionID={session_id}&StreamGroup={stream_group}&Site={site}&DeviceGroup={device_group}"
         
@@ -68,9 +69,9 @@ def fetch_and_save_atv():
             # Sicherstellen, dass der Ausgabeordner existiert
             os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
             
-            # Speichern der m3u8-URL in einer Datei
+            # Speichern der m3u8-URL in einer Datei mit Zeitstempel
             with open(output_file_path, "w") as f:
-                f.write(m3u8_url)
+                f.write(f"{m3u8_url}\nZeitstempel: {time.ctime()}")
             
             print(f"{output_file_path} Datei erfolgreich erstellt.")
             print("Inhalt:")

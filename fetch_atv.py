@@ -19,7 +19,9 @@ def fetch_and_save_atv():
         response.raise_for_status()
         content = response.json()
         
-        # Debug: Ausgabe der gesamten Antwort
+        # Debug: Ausgabe der gesamten Anfrage-URL und Antwort
+        print("Anfrage-URL:")
+        print(response.url)
         print("Antwortinhalt:")
         print(json.dumps(content, indent=2))
 

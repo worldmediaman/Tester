@@ -31,6 +31,7 @@ jobs:
           git config --global user.name "your-username"
           git add result/List/ATV.m3u8
           git commit -m "ATV Playlist updated" || echo "Keine Änderungen zum Committen"
+          git pull --rebase
           git push
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}

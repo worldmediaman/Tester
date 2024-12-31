@@ -6,6 +6,7 @@ import json
 ajax_url = "https://www.atvavrupa.tv/ajax/streaming"
 params_1 = {'menuType': 'CANLIYAYIN'}
 video_info_url = "https://videojs.tmgrup.com.tr/getvideo/45d4cd69-814c-4e2e-bdad-11de9e4b9afd/00000000-0000-0000-0000-000000000000"
+live_ads_timer_url = "https://videojs.tmgrup.com.tr/json/getLiveAdsTimer"
 
 output_file_path = "result/List/ATV.m3u8"
 
@@ -33,12 +34,26 @@ def fetch_and_save_atv():
         video_data = content_2.get("video", {})
         m3u8_url = video_data.get("VideoUrl")
         
-        # Weitere Validierung der URL
+        # Senden der dritten Anfrage, um Live Ads Timer-Daten zu erhalten
+        params_3 = {
+            'websiteid': '45d4cd69-814c-4e2e-bdad-11de9e4b9afd',
+            'dateminute': '1735609577'
+        }
+        response_3 = requests.get(live_ads_timer_url, params=params_3)
+        response_3.raise_for_status()
+        content_3 = response_3.json()
+        
+        # Debug: Ausgabe der dritten Antwort
+        print("Antwortinhalt 3:")
+        print(json.dumps(content_3, indent=2))
+        
+        # Weitere Validierung und Erstellen des M3U8-Inhalts
         if m3u8_url and m3u8_url.endswith('.m3u8'):
             # Erstellen des M3U8-Inhalts
             m3u8_content = f"""#EXTM3U
 #EXT-X-VERSION:3
-#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=3000000,RESOLUTION=1920x1080
+
+#EXTINF:-1, ATV Avrupa
 {m3u8_url}
 """
             # Sicherstellen, dass der Ausgabeordner existiert

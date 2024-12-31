@@ -64,7 +64,7 @@ def fetch_and_save_atv():
         print("Vollständige m3u8-URL:", m3u8_url)
         
         # Weitere Validierung und Erstellen des M3U8-Inhalts
-        if m3u8_url and m3u8_url.endswith('.m3u8'):
+        if m3u8_url:
             # Erstellen des M3U8-Inhalts
             m3u8_content = f"""#EXTM3U
 #EXT-X-VERSION:3

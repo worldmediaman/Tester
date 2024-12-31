@@ -1,7 +1,5 @@
 import requests
-import os
 import json
-import time
 
 # URLs für die Anfragen
 streaming_url = "https://www.atvavrupa.tv/ajax/streaming"

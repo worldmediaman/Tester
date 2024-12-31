@@ -2,14 +2,12 @@ import requests
 import os
 import json
 import time
-import random
-import string
 
 # URLs für die Anfragen
 streaming_url = "https://www.atvavrupa.tv/ajax/streaming"
 params_1 = {'menuType': 'CANLIYAYIN'}
 video_info_url = "https://videojs.tmgrup.com.tr/getvideo/45d4cd69-814c-4e2e-bdad-11de9e4b9afd/00000000-0000-0000-0000-000000000000"
-session_url = "https://videojs.tmgrup.com.tr/json/getLiveAdsTimer"
+secure_token_url = "https://securevideotoken.tmgrup.com.tr/webtv/secure?271042"
 
 output_file_path = "result/List/ATV.m3u8"
 
@@ -40,15 +38,26 @@ def fetch_and_save_atv():
         # Debug: Überprüfen, ob Basis-m3u8-URL gefunden wurde
         print("Gefundene Basis-m3u8-URL:", base_m3u8_url)
 
-        # Generieren eines neuen Tokens und Ablaufzeit
-        session_id = ''.join(random.choices(string.ascii_letters + string.digits, k=36))
-        stream_group = "canli-yayin"
-        site = "atvavrupa"
-        device_group = "web"
-        st = ''.join(random.choices(string.ascii_letters + string.digits, k=22))
+        # Senden der dritten Anfrage, um den Secure Token und andere Parameter zu erhalten
+        secure_params = {
+            'url': base_m3u8_url,
+            'url2': base_m3u8_url
+        }
+        response_3 = requests.get(secure_token_url, params=secure_params)
+        response_3.raise_for_status()
+        content_3 = response_3.json()
+        
+        # Debug: Ausgabe der dritten Antwort
+        print("Antwortinhalt 3:")
+        print(json.dumps(content_3, indent=2))
+        
+        # Extrahieren der dynamischen Parameter aus der dritten Antwort
+        session_id = content_3.get('session_id')
+        st = content_3.get('st')
         e = str(int(time.time()) + 7200)  # Ablaufzeit in 2 Stunden
         
-        m3u8_url = f"{base_m3u8_url}?st={st}&e={e}&SessionID={session_id}&StreamGroup={stream_group}&Site={site}&DeviceGroup={device_group}"
+        # Generieren der vollständigen m3u8-URL
+        m3u8_url = f"{base_m3u8_url}?st={st}&e={e}&SessionID={session_id}&StreamGroup=canli-yayin&Site=atvavrupa&DeviceGroup=web"
         
         # Debug: Überprüfen, ob vollständige m3u8-URL korrekt ist
         print("Vollständige m3u8-URL:", m3u8_url)

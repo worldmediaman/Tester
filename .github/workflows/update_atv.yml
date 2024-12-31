@@ -25,4 +25,12 @@ jobs:
       - name: Run fetch_atv script  # Skript zum Abrufen des ATV-Streams ausführen
         run: python3 fetch_atv.py
 
-      # Commit & Push changes Schritt entfernt
+      - name: Commit & Push changes  # Änderungen committen und pushen
+        run: |
+          git config --global user.email "your-email@example.com"
+          git config --global user.name "your-username"
+          git add result/List/ATV.m3u8
+          git commit -m "ATV Playlist updated" || echo "Keine Änderungen zum Committen"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

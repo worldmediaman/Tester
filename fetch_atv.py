@@ -2,45 +2,55 @@ import requests
 import os
 import json
 
-# URL für die POST-Anfrage
-post_url = "https://zagent891.h-cdn.com/cmd/get_links_info"
-params = {
-    'customer': 'atv',
-    'zone': 'gen',
-    'ver': '1.165.105',
-    'url': 'https://www.atvavrupa.tv/canli-yayin'
-}
-headers = {
-    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 OPR/115.0.0.0',
-    'Accept': 'application/json, text/javascript, */*; q=0.01',
-    'Accept-Language': 'de-DE,de;q=0.9,en-US;q=0.8,en;q=0.7',
-    'Content-Type': 'text/plain;charset=UTF-8',
-    'Origin': 'https://www.atvavrupa.tv',
-    'Referer': 'https://www.atvavrupa.tv/',
-    'Connection': 'keep-alive'
-}
+# URLs für die Anfragen
+ajax_url = "https://www.atvavrupa.tv/ajax/streaming"
+params_1 = {'menuType': 'CANLIYAYIN'}
+video_info_url = "https://videojs.tmgrup.com.tr/getvideo/45d4cd69-814c-4e2e-bdad-11de9e4b9afd/00000000-0000-0000-0000-000000000000"
+live_ads_timer_url = "https://videojs.tmgrup.com.tr/json/getLiveAdsTimer"
 
 output_file_path = "result/List/ATV.m3u8"
 
 def fetch_and_save_atv():
     try:
-        # Senden der POST-Anfrage, um die m3u8-URL zu erhalten
-        response = requests.post(post_url, json=params, headers=headers)
-        response.raise_for_status()
-        content = response.json()
+        # Senden der ersten GET-Anfrage, um die Streaming-Daten zu erhalten
+        response_1 = requests.get(ajax_url, params=params_1)
+        response_1.raise_for_status()
+        content_1 = response_1.json()
         
-        # Debug: Ausgabe der Antwort
-        print("Antwortinhalt:")
-        print(json.dumps(content, indent=2))
+        # Debug: Ausgabe der ersten Antwort
+        print("Antwortinhalt 1:")
+        print(json.dumps(content_1, indent=2))
         
-        # Extrahieren der m3u8-URL aus der Antwort
-        if content.get("error"):
-            print("Fehler in der Antwort:", content["error"])
-            return
-
-        m3u8_url = content.get("url")
+        # Senden der zweiten Anfrage, um die Video-Informationen zu erhalten
+        response_2 = requests.get(video_info_url)
+        response_2.raise_for_status()
+        content_2 = response_2.json()
         
-        # Weitere Validierung der URL
+        # Debug: Ausgabe der zweiten Antwort
+        print("Antwortinhalt 2:")
+        print(json.dumps(content_2, indent=2))
+        
+        # Extrahieren der m3u8-URL aus der zweiten Antwort
+        video_data = content_2.get("video", {})
+        m3u8_url = video_data.get("VideoUrl")
+        
+        # Debug: Überprüfen, ob m3u8-URL gefunden wurde
+        print("Gefundene m3u8-URL:", m3u8_url)
+        
+        # Senden der dritten Anfrage, um Live Ads Timer-Daten zu erhalten
+        params_3 = {
+            'websiteid': '45d4cd69-814c-4e2e-bdad-11de9e4b9afd',
+            'dateminute': '1735609577'
+        }
+        response_3 = requests.get(live_ads_timer_url, params=params_3)
+        response_3.raise_for_status()
+        content_3 = response_3.json()
+        
+        # Debug: Ausgabe der dritten Antwort
+        print("Antwortinhalt 3:")
+        print(json.dumps(content_3, indent=2))
+        
+        # Weitere Validierung und Erstellen des M3U8-Inhalts
         if m3u8_url and m3u8_url.endswith('.m3u8'):
             # Erstellen des M3U8-Inhalts
             m3u8_content = f"""#EXTM3U
